@@ -2,8 +2,8 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import os
 from sqlalchemy.orm import Session
-from database import SessionLocal
-from models import Movie
+from backend.database import SessionLocal
+from backend.models import *
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
