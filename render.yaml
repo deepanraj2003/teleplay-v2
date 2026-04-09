@@ -1,9 +1,7 @@
 services:
   - type: web
-    name: teleplay-v2
+    name: teleplay
     env: python
-    buildCommand: "pip install -r backend/requirements.txt"
-    startCommand: "chmod +x start.sh && ./start.sh"
-    envVars:
-      - key: PORT
-        value: 10000
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: chmod +x start.sh && ./start.sh
+    plan: free
