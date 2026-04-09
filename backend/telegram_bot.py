@@ -7,11 +7,16 @@ from models import Movie
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 async def handle_files(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("UPDATE RECEIVED:", update)
+
     if update.channel_post:
         message = update.channel_post
+        print("CHANNEL POST DETECTED")
 
         if message.video or message.document:
             file = message.video or message.document
+
+            print("FILE DETECTED:", file.file_name)
 
             db = SessionLocal()
 
