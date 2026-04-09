@@ -8,6 +8,23 @@ from backend.database import engine
 from backend.models import Base, Movie
 from sqlalchemy.orm import Session
 
+import requests
+import os
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+
+@app.get("/api/stream/{file_id}")
+def stream_video(file_id: str):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getFile?file_id={file_id}"
+    res = requests.get(url).json()
+
+    file_path = res["result"]["file_path"]
+
+    file_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
+
+    return {"url": file_url}
+
 app = FastAPI()
 
 # ✅ Create tables
