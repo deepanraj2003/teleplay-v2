@@ -53,3 +53,5 @@ def get_movies():
     db.close()
 
     return movies
+# Start bot in background
+threading.Thread(target=start_bot).start()
