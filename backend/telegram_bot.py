@@ -34,4 +34,5 @@ async def run_bot():
     print("Bot started...")
     await app.initialize()
     await app.start()
-    await app.updater.start_polling()
+    await app.bot.delete_webhook(drop_pending_updates=True)
+    await app.run_polling()
