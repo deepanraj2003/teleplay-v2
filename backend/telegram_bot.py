@@ -1,4 +1,5 @@
 import os
+import asyncio
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 from database import SessionLocal
@@ -7,16 +8,11 @@ from models import Movie
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 async def handle_files(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("UPDATE RECEIVED:", update)
-
     if update.channel_post:
         message = update.channel_post
-        print("CHANNEL POST DETECTED")
 
         if message.video or message.document:
             file = message.video or message.document
-
-            print("FILE DETECTED:", file.file_name)
 
             db = SessionLocal()
 
@@ -31,11 +27,11 @@ async def handle_files(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             print(f"Saved: {file.file_name}")
 
-
-def start_bot():
+async def run_bot():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
-
     app.add_handler(MessageHandler(filters.ALL, handle_files))
 
     print("Bot started...")
-    app.run_polling()
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
