@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from database import SessionLocal
+from models import Movie
 
 app = FastAPI()
 
-# Allow frontend to connect
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -12,10 +13,41 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Create DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 @app.get("/")
 def home():
     return {"message": "TelePlay v2 is running 🚀"}
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+
+# 🔥 ADD MOVIE (TEST)
+@app.get("/add-test")
+def add_test_movie():
+    db = SessionLocal()
+
+    movie = Movie(
+        name="Test Movie",
+        file_id="123456"
+    )
+
+    db.add(movie)
+    db.commit()
+    db.close()
+
+    return {"message": "Test movie added"}
+
+
+# 🔥 GET ALL MOVIES
+@app.get("/movies")
+def get_movies():
+    db = SessionLocal()
+    movies = db.query(Movie).all()
+    db.close()
+
+    return movies
