@@ -1,3 +1,5 @@
+import asyncio
+from telegram_bot import run_bot
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import SessionLocal
