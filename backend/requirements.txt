@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-python-dotenv
+python-telegram-bot==22.7
 sqlalchemy
 psycopg2-binary
-python-telegram-bot
+python-dotenv
