@@ -53,3 +53,6 @@ def get_movies():
     db.close()
 
     return movies
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(run_bot())
