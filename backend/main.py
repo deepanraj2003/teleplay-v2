@@ -1,5 +1,3 @@
-import threading
-from telegram_bot import start_bot
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import SessionLocal
@@ -53,5 +51,3 @@ def get_movies():
     db.close()
 
     return movies
-# Start bot in background
-threading.Thread(target=start_bot).start()
