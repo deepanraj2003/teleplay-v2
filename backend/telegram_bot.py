@@ -1,38 +1,52 @@
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import os
-from telegram.ext import ApplicationBuilder, MessageHandler, filters
+from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import Movie
 
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-async def handle_files(update, context):
-    if update.channel_post:
-        message = update.channel_post
+app = Application.builder().token(BOT_TOKEN).build()
 
-        if message.video or message.document:
-            file = message.video or message.document
 
-            db = SessionLocal()
+# ✅ Start command
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Send me a movie 🎬")
 
-            movie = Movie(
-                name=file.file_name or "Unknown",
-                file_id=file.file_id
-            )
 
-            db.add(movie)
-            db.commit()
-            db.close()
+# ✅ Handle video upload
+async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    video = update.message.video
 
-            print(f"Saved: {file.file_name}")
+    if not video:
+        return
 
+    file_id = video.file_id
+    name = video.file_name or "Unknown"
+
+    db: Session = SessionLocal()
+
+    movie = Movie(name=name, file_id=file_id)
+    db.add(movie)
+    db.commit()
+    db.close()
+
+    await update.message.reply_text(f"Saved: {name} ✅")
+
+
+# Handlers
+app.add_handler(CommandHandler("start", start))
+app.add_handler(MessageHandler(filters.VIDEO, handle_video))
+
+
+# ✅ RUN BOT (IMPORTANT FIX)
 async def run_bot():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-
-    app.add_handler(MessageHandler(filters.ALL, handle_files))
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
 
     print("Bot started...")
 
-    await app.initialize()
-    await app.start()
-    await app.bot.delete_webhook(drop_pending_updates=True)
-    await app.updater.start_polling()
+    # keep running forever
+    await app.updater.idle()
