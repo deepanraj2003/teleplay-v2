@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Player</title>
+</head>
+<body>
+    <h1>Player</h1>
+    <video id="video" controls width="600"></video>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const fileId = params.get("file_id");
+
+        const video = document.getElementById("video");
+
+        if (fileId) {
+            video.src = `https://api.telegram.org/file/botYOUR_BOT_TOKEN/${fileId}`;
+        }
+    </script>
+</body>
+</html>
