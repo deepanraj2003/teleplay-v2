@@ -3,7 +3,7 @@ services:
     name: teleplay-v2
     env: python
     buildCommand: "pip install -r backend/requirements.txt"
-    startCommand: "bash start.sh"
+    startCommand: "chmod +x start.sh && ./start.sh"
     envVars:
       - key: PORT
         value: 10000
