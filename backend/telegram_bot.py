@@ -29,10 +29,10 @@ async def handle_files(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def run_bot():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
+
     app.add_handler(MessageHandler(filters.ALL, handle_files))
 
     print("Bot started...")
-    await app.initialize()
-    await app.start()
+
     await app.bot.delete_webhook(drop_pending_updates=True)
     await app.run_polling()
