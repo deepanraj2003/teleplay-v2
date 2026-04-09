@@ -1,13 +1,11 @@
 import os
-import asyncio
-from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
+from telegram.ext import ApplicationBuilder, MessageHandler, filters
 from database import SessionLocal
 from models import Movie
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
-async def handle_files(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_files(update, context):
     if update.channel_post:
         message = update.channel_post
 
@@ -34,5 +32,7 @@ async def run_bot():
 
     print("Bot started...")
 
+    await app.initialize()
+    await app.start()
     await app.bot.delete_webhook(drop_pending_updates=True)
-    await app.run_polling()
+    await app.updater.start_polling()
