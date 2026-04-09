@@ -1,52 +1,47 @@
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-import os
-from sqlalchemy.orm import Session
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from backend.database import SessionLocal
-from backend.models import *
+from backend.models import Movie
+
+import os
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-app = Application.builder().token(BOT_TOKEN).build()
 
 
 # ✅ Start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Send me a movie 🎬")
+    await update.message.reply_text("Bot working 🚀")
 
 
-# ✅ Handle video upload
+# ✅ Save uploaded video
 async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    video = update.message.video
+    video = update.message.video or update.message.document
 
     if not video:
         return
 
     file_id = video.file_id
-    name = video.file_name or "Unknown"
+    name = video.file_name or "Unknown Movie"
 
-    db: Session = SessionLocal()
-
+    db = SessionLocal()
     movie = Movie(name=name, file_id=file_id)
     db.add(movie)
     db.commit()
     db.close()
 
-    await update.message.reply_text(f"Saved: {name} ✅")
+    await update.message.reply_text(f"Saved: {name}")
 
 
-# Handlers
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.VIDEO, handle_video))
+def create_application():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("ping", start))
+    app.add_handler(
+        CommandHandler("help", start)
+    )
 
-# ✅ RUN BOT (IMPORTANT FIX)
-async def run_bot():
-    await app.initialize()
-    await app.start()
-    await app.updater.start_polling()
+    from telegram.ext import MessageHandler, filters
+    app.add_handler(MessageHandler(filters.VIDEO | filters.Document.ALL, handle_video))
 
-    print("Bot started...")
-
-    # keep running forever
-    await app.updater.idle()
+    return app
